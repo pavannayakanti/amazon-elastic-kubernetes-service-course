@@ -9,7 +9,7 @@ If you came here from the [Amazon EKS course](https://learn.kodekloud.com/user/c
     Clone the required repository
 
     ```bash
-    git clone https://github.com/kodekloudhub/amazon-elastic-kubernetes-service-course
+    git clone https://github.com/pavannayakanti/amazon-elastic-kubernetes-service-course
     ```
 
 1. Navigate to the EKS Directory
