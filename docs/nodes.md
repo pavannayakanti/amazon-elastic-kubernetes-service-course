@@ -1,4 +1,4 @@
-# Set up access and join nodes
+## Set up access and join nodes
 
 1.  Create a KUBECONFIG for `kubectl`
 
