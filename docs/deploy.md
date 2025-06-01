@@ -2,7 +2,7 @@
 
 **IMPORTANT**: Ensure that all resources are created in the `us-east-1` (N. Virginia) region
 
-If you came here from the [Amazon EKS course](https://learn.kodekloud.com/user/courses/aws-eks), this is lab step 3.
+this is lab step 3.
 
 1. Clone the Repository
 
@@ -28,7 +28,7 @@ If you came here from the [Amazon EKS course](https://learn.kodekloud.com/user/c
         .\check-environment.ps1
         ```
 
-    * **Otherwise** for everything else (KodeKloud lab terminal, CloudShell, any Linux or Mac), instead run this:
+    * **Otherwise** for everything else (CloudShell, any Linux or Mac), instead run this:
 
         ```bash
         source check-environment.sh
