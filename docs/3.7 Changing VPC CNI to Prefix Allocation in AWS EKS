@@ -1,0 +1,62 @@
+# 🌐 Changing VPC CNI to Prefix Allocation in AWS EKS
+
+This guide walks you through updating the AWS VPC CNI plugin to enable **prefix-based IP allocation**, which helps improve pod density and IP management in your EKS cluster.
+
+---
+
+## 📥 Step 1: Download the Configuration
+
+Download the latest CNI configuration YAML from the AWS VPC CNI GitHub repository:
+
+```bash
+curl -o aws-k8s-cni.yaml https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/master/config/master/aws-k8s-cni.yaml
+
+📝 Step 2: Edit the Configuration
+🔧 Enable Prefix Assignment
+Open the aws-k8s-cni.yaml file in your editor.
+
+Locate the environment variable section inside the container spec (look for the env: block).
+
+Edit the following line to enable prefix delegation:
+```bash
+env:
+  - name: ENABLE_PREFIX_DELEGATION
+    value: "true"
+Make sure it is correctly placed within the container definition of the aws-node DaemonSet.
+
+🔄 Edit amazon-vpc-cni ConfigMap
+In the same file, update the ConfigMap section to enable network policy controller:
+
+```bash
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amazon-vpc-cni
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: aws-node
+    app.kubernetes.io/instance: aws-vpc-cni
+    k8s-app: aws-node
+    app.kubernetes.io/version: "v1.18.1"
+data:
+  enable-windows-ipam: "false"
+  enable-network-policy-controller: "true"  # Change from false to true
+
+  🛠️ Update DaemonSet Arguments
+Look for the container arguments (args:) under the aws-node DaemonSet and make the following changes:
+```bash
+args:
+  - --enable-ipv6=false
+  - --enable-network-policy=true        # Change from false to true
+  - --enable-cloudwatch-logs=false
+  - --enable-policy-event-logs=false
+
+  ✅ Step 3: Apply the Configuration
+Apply the changes using kubectl:
+
+```bash
+kubectl apply -f aws-k8s-cni.yaml
+⚠️ Note
+You may see warning messages while applying the YAML — these are generally safe to ignore if the configuration is valid.
+
+📌 Prefix delegation allows more pods per node by assigning IP blocks instead of single IPs. This is highly useful for clusters with high pod density requirements.
