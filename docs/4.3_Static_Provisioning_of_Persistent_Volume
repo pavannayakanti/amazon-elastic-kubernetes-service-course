@@ -1,0 +1,90 @@
+# 📦 Static Provisioning of Persistent Volume in AWS EKS
+
+This lab demonstrates how to statically provision an EBS volume and bind it to a pod in EKS using Kubernetes resources.
+
+---
+
+## 🔧 Step 1: Create an EBS Volume Using AWS CLI
+
+```bash
+aws ec2 create-volume \
+  --size 10 \
+  --region us-east-1 \
+  --availability-zone us-east-1a \
+  --volume-type gp2
+```
+📌 Note: Copy the VolumeId from the output. You will use it in the next step.
+
+## 📜 Step 2: Apply Kubernetes Manifest
+Replace <vol-id> with your actual EBS Volume ID.
+``` bash
+cat <<EOF | kubectl apply -f -
+# PersistentVolume (PV)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ebs-pv
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  csi:
+    driver: ebs.csi.aws.com
+    fsType: ext4
+    volumeHandle: <vol-id>
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: topology.kubernetes.io/zone
+              operator: In
+              values:
+                - us-east-1a
+---
+# PersistentVolumeClaim (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-pvc
+spec:
+  storageClassName: ""
+  volumeName: ebs-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+# Pod using the PVC
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-pod
+spec:
+  nodeSelector: 
+    topology.kubernetes.io/zone: us-east-1a
+  containers:
+  - name: app
+    image: busybox
+    command: [ "sh", "-c", "echo Hello Kubernetes! && sleep 3600" ]
+    volumeMounts:
+    - mountPath: "/data"
+      name: ebs-storage
+  volumes:
+  - name: ebs-storage
+    persistentVolumeClaim:
+      claimName: ebs-pvc
+EOF
+```
+
+## ✅ Step 3: Verify the Resources
+Run the following commands to confirm that all components are successfully created:
+``` bash
+kubectl get pv
+kubectl get pvc
+kubectl get pod
+```
+## 🎉 Your statically provisioned EBS volume is now attached and in use!
+
