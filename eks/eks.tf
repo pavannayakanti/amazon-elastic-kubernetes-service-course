@@ -23,7 +23,7 @@ module "create_eksClusterRole" {
 ####################################################################
 
 resource "aws_eks_cluster" "demo_eks" {
-  name     = var.cluster_name
+  name = var.cluster_name != "" ? var.cluster_name : "demo-eks-${var.trainee_name}"
   role_arn = var.use_predefined_role ? module.use_eksClusterRole[0].eksClusterRole_arn : module.create_eksClusterRole[0].eksClusterRole_arn
 
   vpc_config {
