@@ -5,10 +5,16 @@
 ####################################################################
 
 # KK Playground. Cluster must be called 'demo-eks'
-variable "cluster_name" {
+
+variable "trainee_name" {
+  description = "Name of the trainee to uniquely identify the EKS cluster"
   type        = string
-  description = "Name of the cluster"
-  default     = "demo-eks"
+}
+
+variable "cluster_name" {
+  description = "EKS Cluster name"
+  type        = string
+  default     = ""
 }
 
 # KK Playground. Cluster role must be called 'eksClusterRole'
