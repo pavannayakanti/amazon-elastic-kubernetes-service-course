@@ -79,7 +79,7 @@ terraform version
     Outputs:
 
     NodeAutoScalingGroup = "demo-eks-stack-NodeGroup-UUJRINMIFPLO"
-    NodeInstanceRole = "arn:aws:iam::058264119838:role/eksWorkerNodeRole"
+    NodeInstanceRole = "arn:aws:iam::058264119838:role/eksWorkerNodeRole-<trainee-name>"
     NodeSecurityGroup = "sg-003010e8d8f9f32bd"
     ```
 
