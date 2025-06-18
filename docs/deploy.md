@@ -19,16 +19,13 @@ this is lab step 3.
     ```bash
     cd amazon-elastic-kubernetes-service-course/eks
     ```
-
-1. Run the following command. It will check the lab/cloud environment for a few things that need to be correct for the cluster to deploy properly. If it tells you to restart the lab, then please do so. If it still tells you to restart the lab after 2 or 3 attempts, then please report in the forums.
-
-    * If *and only if* you are running this lab directly from a Windows PowerShell terminal, run the following
-
-        ```text
-        .\check-environment.ps1
-        ```
-
-    * **Otherwise** for everything else (CloudShell, any Linux or Mac), instead run this:
+1. Download the terraform
+    ```bash
+    wget https://releases.hashicorp.com/terraform/1.12.2/terraform_1.12.2_linux_amd64.zip
+    ```
+    
+1. Run the following command. It will check the lab/cloud environment for a few things that need to be correct for the cluster to deploy properly. 
+   run this:
 
         ```bash
         source check-environment.sh
@@ -38,7 +35,7 @@ this is lab step 3.
 If you encounter the error `terraform: command not found`, follow these steps to install Terraform manually in AWS CloudShell:
 
 ```bash
-unzip terraform_1.7.3_linux_amd64.zip
+unzip terraform_1.12.2_linux_amd64.zip
 sudo mv terraform /usr/local/bin/
 ```
 
