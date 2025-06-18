@@ -40,6 +40,9 @@ If you encounter the error `terraform: command not found`, follow these steps to
 ```bash
 unzip terraform_1.7.3_linux_amd64.zip
 sudo mv terraform /usr/local/bin/
+```
+
+```bash
 terraform version
 ```
 1. Initialize Terraform
