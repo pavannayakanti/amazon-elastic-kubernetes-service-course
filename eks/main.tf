@@ -20,6 +20,12 @@ provider "aws" {
   }
 }
 
+####################################################################
+#
+# IAM Role Modules
+#
+####################################################################
+
 # Reuse service role if it already exists
 module "use_eksClusterRole" {
   count  = var.use_predefined_role ? 1 : 0
@@ -33,8 +39,8 @@ module "create_eksClusterRole" {
   count  = var.use_predefined_role ? 0 : 1
   source = "./modules/create-service-role"
 
-  cluster_role_name        = local.cluster_role_name
-  additional_policy_arns   = [aws_iam_policy.loadbalancer_policy.arn]
+  cluster_role_name      = local.cluster_role_name
+  additional_policy_arns = [aws_iam_policy.loadbalancer_policy.arn]
 }
 
 ####################################################################
