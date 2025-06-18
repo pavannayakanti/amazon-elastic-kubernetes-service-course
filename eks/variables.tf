@@ -52,3 +52,8 @@ variable "node_group_min_size" {
   default     = 1
 }
 
+variable "use_predefined_role" {
+  type        = bool
+  description = "Whether to use predefined cluster service role, or create one."
+  default     = false
+}
