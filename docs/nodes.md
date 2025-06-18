@@ -3,7 +3,7 @@
 1.  Create a KUBECONFIG for `kubectl`
 
     ```bash
-    aws eks update-kubeconfig --region us-east-1 --name demo-eks
+    aws eks update-kubeconfig --region us-east-1 --name demo-eks-<trainee-name>
     ```
 
 1.  Join the worker nodes
