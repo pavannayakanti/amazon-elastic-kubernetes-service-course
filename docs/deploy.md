@@ -21,7 +21,7 @@ this is lab step 3.
     ```
 1. Download the terraform
 
-    Change into the EKS directory
+    Download the terraform
 
     ```bash
     wget https://releases.hashicorp.com/terraform/1.12.2/terraform_1.12.2_linux_amd64.zip
