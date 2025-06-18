@@ -20,14 +20,7 @@ provider "aws" {
   }
 }
 
-# Locals for dynamic naming based on trainee_name
-locals {
-  cluster_name           = var.cluster_name != "" ? var.cluster_name : "demo-eks-${var.trainee_name}"
-  cluster_role_name      = var.cluster_role_name != "" ? var.cluster_role_name : "eksClusterRole-${var.trainee_name}"
-  node_role_name         = var.node_role_name != "" ? var.node_role_name : "eksWorkerNodeRole-${var.trainee_name}"
-  additional_policy_name = var.additional_policy_name != "" ? var.additional_policy_name : "eksPolicy-${var.trainee_name}"
-}
-
+# Reuse service role if it already exists
 module "use_eksClusterRole" {
   count  = var.use_predefined_role ? 1 : 0
   source = "./modules/use-service-role"
@@ -35,14 +28,13 @@ module "use_eksClusterRole" {
   cluster_role_name = local.cluster_role_name
 }
 
+# Create new EKS cluster service role and attach additional policy
 module "create_eksClusterRole" {
   count  = var.use_predefined_role ? 0 : 1
   source = "./modules/create-service-role"
 
-  cluster_role_name = local.cluster_role_name
-  additional_policy_arns = [
-    aws_iam_policy.loadbalancer_policy.arn
-  ]
+  cluster_role_name        = local.cluster_role_name
+  additional_policy_arns   = [aws_iam_policy.loadbalancer_policy.arn]
 }
 
 ####################################################################
@@ -69,7 +61,12 @@ resource "aws_eks_cluster" "demo_eks" {
   }
 }
 
+####################################################################
+#
 # Outputs
+#
+####################################################################
+
 output "NodeInstanceRole" {
   value = aws_iam_role.node_instance_role.arn
 }
