@@ -14,12 +14,6 @@ variable "trainee_name" {
 variable "cluster_name" {
   description = "EKS Cluster name"
   type        = string
-  default     = ""
-}
-
-variable "cluster_name" {
-  description = "EKS Cluster name"
-  type        = string
   default     = "" # default to empty, dynamically created in main.tf
 }
 
