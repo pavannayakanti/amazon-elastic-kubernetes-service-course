@@ -1,19 +1,16 @@
-
 module "use_eksClusterRole" {
   count  = var.use_predefined_role ? 1 : 0
   source = "./modules/use-service-role"
 
-  cluster_role_name = var.cluster_role_name
+  cluster_role_name = local.cluster_role_name
 }
 
 module "create_eksClusterRole" {
   count  = var.use_predefined_role ? 0 : 1
   source = "./modules/create-service-role"
 
-  cluster_role_name = var.cluster_role_name
-  additional_policy_arns = [
-    aws_iam_policy.loadbalancer_policy.arn
-  ]
+  cluster_role_name      = local.cluster_role_name
+  additional_policy_arns = [aws_iam_policy.loadbalancer_policy.arn]
 }
 
 ####################################################################
@@ -23,7 +20,7 @@ module "create_eksClusterRole" {
 ####################################################################
 
 resource "aws_eks_cluster" "demo_eks" {
-  name = var.cluster_name != "" ? var.cluster_name : "demo-eks-${var.trainee_name}"
+  name     = local.cluster_name
   role_arn = var.use_predefined_role ? module.use_eksClusterRole[0].eksClusterRole_arn : module.create_eksClusterRole[0].eksClusterRole_arn
 
   vpc_config {
@@ -39,4 +36,3 @@ resource "aws_eks_cluster" "demo_eks" {
     bootstrap_cluster_creator_admin_permissions = true
   }
 }
-
