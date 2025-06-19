@@ -58,7 +58,7 @@ terraform version
     Apply the Terraform configuration to provision the EKS cluster. This step will take up to 10 minutes to complete
 
     ```bash
-    terraform apply -var="trainee_name=<trainee-name>" -var="use_predefined_role=false"
+    terraform apply
     ```
 
     When prompted, type `yes` to confirm.
@@ -71,7 +71,7 @@ terraform version
     Outputs:
 
     NodeAutoScalingGroup = "demo-eks-stack-NodeGroup-UUJRINMIFPLO"
-    NodeInstanceRole = "arn:aws:iam::058264119838:role/eksWorkerNodeRole-<trainee-name>"
+    NodeInstanceRole = "arn:aws:iam::058264119838:role/eksWorkerNodeRole"
     NodeSecurityGroup = "sg-003010e8d8f9f32bd"
     ```
 
