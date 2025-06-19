@@ -71,7 +71,7 @@ This does not destroy the cluster. Your EKS control plane and configs stay intac
 ---
 
 ## 📌 Tip
-You can automate this using:
+You can use this command as an alternative:
 ```bash
 aws autoscaling update-auto-scaling-group \
   --auto-scaling-group-name <your-ASG-name> \
