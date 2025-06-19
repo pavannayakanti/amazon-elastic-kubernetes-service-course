@@ -11,7 +11,11 @@ this is lab step 3.
     ```bash
     git clone https://github.com/pavannayakanti/amazon-elastic-kubernetes-service-course
     ```
+1. Switch to Working directory
 
+    ```bash
+    git switch working-branch
+    ```
 1. Navigate to the EKS Directory
 
     Change into the EKS directory
