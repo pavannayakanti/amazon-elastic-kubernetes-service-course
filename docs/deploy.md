@@ -30,21 +30,21 @@ this is lab step 3.
     
 1. Run the following command. It will check the lab/cloud environment for a few things that need to be correct for the cluster to deploy properly. 
    run this:
-```bash
-source check-environment.sh
-```
+    ```bash
+    source check-environment.sh
+    ```
 ### ⚙️ Installing Terraform in AWS CloudShell
 
 If you encounter the error `terraform: command not found`, follow these steps to install Terraform manually in AWS CloudShell:
 
-```bash
-unzip terraform_1.12.2_linux_amd64.zip
-sudo mv terraform /usr/local/bin/
-```
+    ```bash
+    unzip terraform_1.12.2_linux_amd64.zip
+    sudo mv terraform /usr/local/bin/
+    ```
 
-```bash
-terraform version
-```
+    ```bash
+    terraform version
+    ```
 1. Initialize Terraform
 
     Initialize the Terraform configuration
