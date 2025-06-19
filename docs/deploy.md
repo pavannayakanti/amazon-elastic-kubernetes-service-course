@@ -63,7 +63,7 @@ terraform version
     Apply the Terraform configuration to provision the EKS cluster. This step will take up to 10 minutes to complete
 
     ```bash
-    terraform apply
+    terraform apply -var="trainee_name=<trainee-name>" -var="use_predefined_role=false"
     ```
 
     When prompted, type `yes` to confirm.
