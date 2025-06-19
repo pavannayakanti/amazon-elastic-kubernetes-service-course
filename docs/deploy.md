@@ -7,7 +7,6 @@ this is lab step 3.
 1. Clone the Repository
 
     Clone the required repository
-
     ```bash
     git clone https://github.com/pavannayakanti/amazon-elastic-kubernetes-service-course
     ```
@@ -36,17 +35,11 @@ this is lab step 3.
 ### ⚙️ Installing Terraform in AWS CloudShell
 
 If you encounter the error `terraform: command not found`, follow these steps to install Terraform manually in AWS CloudShell:
-
-    ```bash
     
     unzip terraform_1.12.2_linux_amd64.zip
     sudo mv terraform /usr/local/bin/
-    
-    ```
-
-    ```bash
     terraform version
-    ```
+    
 1. Initialize Terraform
 
     Initialize the Terraform configuration
