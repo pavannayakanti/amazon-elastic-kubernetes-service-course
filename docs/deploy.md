@@ -38,8 +38,10 @@ this is lab step 3.
 If you encounter the error `terraform: command not found`, follow these steps to install Terraform manually in AWS CloudShell:
 
     ```bash
+    
     unzip terraform_1.12.2_linux_amd64.zip
     sudo mv terraform /usr/local/bin/
+    
     ```
 
     ```bash
