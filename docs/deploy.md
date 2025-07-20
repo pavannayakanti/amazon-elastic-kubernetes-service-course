@@ -12,12 +12,7 @@ this is lab step 3.
     ```
 1. Switch to Working directory
 
-    ```bash
-    git switch working-branch
-    ```
 1. Navigate to the EKS Directory
-
-    Change into the EKS directory
 
     ```bash
     cd amazon-elastic-kubernetes-service-course/eks
@@ -40,6 +35,26 @@ If you encounter the error `terraform: command not found`, follow these steps to
     sudo mv terraform /usr/local/bin/
     terraform version
     
+=======
+1. Run the following command. It will check the lab/cloud environment for a few things that need to be correct for the cluster to deploy properly. 
+
+    * **Otherwise** for everything else (CloudShell, any Linux or Mac), instead run this:
+
+        ```bash
+        source check-environment.sh
+        ```
+### ⚙️ Installing Terraform in AWS CloudShell
+
+If you encounter the error `terraform: command not found`, follow these steps to install Terraform manually in AWS CloudShell:
+
+```bash
+unzip terraform_1.12.2_linux_amd64.zip
+sudo mv terraform /usr/local/bin/
+```
+
+```bash
+terraform version
+```
 1. Initialize Terraform
 
     Initialize the Terraform configuration
