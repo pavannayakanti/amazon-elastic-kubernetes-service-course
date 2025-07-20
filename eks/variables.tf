@@ -5,47 +5,40 @@
 ####################################################################
 
 # KK Playground. Cluster must be called 'demo-eks'
-variable "cluster_name" {
+
+variable "trainee_name" {
+  description = "Name of the trainee to uniquely identify the EKS cluster"
   type        = string
-  description = "Name of the cluster"
-  default     = "demo-eks"
 }
 
-# KK Playground. Cluster role must be called 'eksClusterRole'
+variable "cluster_name" {
+  description = "EKS Cluster name"
+  type        = string
+  default     = "" # default to empty, dynamically created in main.tf
+}
+
 variable "cluster_role_name" {
   type        = string
   description = "Name of the cluster role"
-  default     = "eksClusterRole"
+  default     = "" # default to empty, dynamically created in main.tf
 }
 
-# In KK playground and for some EKS labs, the role is not predefined.
-# In some other EKS labs, the service role exists already.
-# This variable is initialized as an environment variable source
-# by check-environment.sh if it is required to be "true"
-variable "use_predefined_role" {
-  type        = bool
-  description = "Whether to use predefined cluster service role, or create one."
-  default     = false
-}
-
-# KK Playground. Node role must be called 'eksWorkerNodeRole'
 variable "node_role_name" {
   type        = string
   description = "Name of node role"
-  default     = "eksWorkerNodeRole"
+  default     = "" # default to empty, dynamically created in main.tf
 }
 
-# KK Playground. Policy role must be called 'eksPolicy'
 variable "additional_policy_name" {
-    type = string
-    description = "Name of IAM::Policy created for additional permissions"
-    default = "eksPolicy"
+  type        = string
+  description = "Name of IAM::Policy created for additional permissions"
+  default     = "" # default to empty, dynamically created in main.tf
 }
 
 variable "node_group_desired_capacity" {
   type        = number
   description = "Desired capacity of Node Group ASG."
-  default     = 3
+  default     = 2
 }
 variable "node_group_max_size" {
   type        = number
@@ -59,3 +52,8 @@ variable "node_group_min_size" {
   default     = 1
 }
 
+variable "use_predefined_role" {
+  type        = bool
+  description = "Whether to use predefined cluster service role, or create one."
+  default     = false
+}

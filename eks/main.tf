@@ -1,6 +1,6 @@
 ####################################################################
 #
-#
+# Main Terraform config for EKS cluster with trainee-specific names
 #
 ####################################################################
 
@@ -11,12 +11,33 @@ variable "aws_region" {
 
 provider "aws" {
   region = var.aws_region
-  #   default_tags {
-  #     tags = {
-  #       "kubernetes.io/cluster/demo-eks" = "owned"
-  #     }
-  #   }
+
+  default_tags {
+    tags = {
+      "Owner"                                      = var.trainee_name
+      "kubernetes.io/cluster/${local.cluster_name}" = "owned"
+    }
+  }
 }
+
+####################################################################
+#
+# IAM Role Modules
+#
+####################################################################
+
+####################################################################
+#
+# Creates the EKS Cluster control plane
+#
+####################################################################
+
+
+####################################################################
+#
+# Outputs
+#
+####################################################################
 
 output "NodeInstanceRole" {
   value = aws_iam_role.node_instance_role.arn

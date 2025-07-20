@@ -1,54 +1,38 @@
 ####################################################################
 #
-# Creates the unmanaged node group
-#
-# Most of these resources are terraform resources converted from
-# the CloudFormation template at
-# https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2022-12-23/amazon-eks-nodegroup.yaml
+# Creates the unmanaged node group (trainee-specific)
 #
 ####################################################################
 
-
-# Create an SSH key pair for logging into the EC2 instances
-# Security note:
-# Generally not good practice to generate keys like this in Terraform
-# as the key material is stored in the state file.
-# Key pairs should be created externally and passed to Terraform as
-# a variable.
 resource "tls_private_key" "key_pair" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-# Save the private key to local .ssh directory so it can be used by SSH clients
 resource "local_sensitive_file" "pem_file" {
-  filename        = pathexpand("~/.ssh/eks-aws.pem")
+  filename        = pathexpand("~/.ssh/eks-aws-${var.trainee_name}.pem")
   file_permission = "600"
   content         = tls_private_key.key_pair.private_key_pem
 }
 
-# Upload the public key of the key pair to AWS so it can be added to the instances
 resource "aws_key_pair" "eks_kp" {
-  key_name   = "eks_kp"
+  key_name   = "eks_kp_${var.trainee_name}"
   public_key = trimspace(tls_private_key.key_pair.public_key_openssh)
 }
 
 data "aws_iam_policy_document" "assume_role_ec2" {
   statement {
     effect = "Allow"
-
     principals {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
-
     actions = ["sts:AssumeRole"]
   }
 }
 
-# IAM role to assign to worker nodes
 resource "aws_iam_role" "node_instance_role" {
-  name               = var.node_role_name
+  name               = local.node_role_name
   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
   path               = "/"
 }
@@ -78,27 +62,20 @@ resource "aws_iam_role_policy_attachment" "node_instance_role_loadbalancer" {
   role       = aws_iam_role.node_instance_role.name
 }
 
-# Instance profile to associate above role with worker nodes
 resource "aws_iam_instance_profile" "node_instance_profile" {
-  name = "NodeInstanceProfile"
+  name = "${local.node_role_name}-profile"
   path = "/"
   role = aws_iam_role.node_instance_role.id
 }
 
-# Security group to apply to worker nodes
 resource "aws_security_group" "node_security_group" {
-  name        = "NodeSecurityGroupIngress"
+  name        = "NodeSecurityGroupIngress-${var.trainee_name}"
   description = "Security group for all nodes in the cluster"
   vpc_id      = data.aws_vpc.default_vpc.id
   tags = {
-    "Name" = "NodeSecurityGroupIngress"
+    "Name" = "NodeSecurityGroupIngress-${var.trainee_name}"
   }
 }
-
-#
-# Now follows several rules that are applied to the node security group
-# to allow control plane to access nodes
-#
 
 resource "aws_vpc_security_group_ingress_rule" "node_security_group_ingress" {
   description                  = "Allow node to communicate with each other"
@@ -107,7 +84,6 @@ resource "aws_vpc_security_group_ingress_rule" "node_security_group_ingress" {
   referenced_security_group_id = aws_security_group.node_security_group.id
 }
 
-# CloudFormation defaults to egress all. Terraform does not.
 resource "aws_vpc_security_group_egress_rule" "node_egress_all" {
   description       = "Allow node egress to anywhere"
   ip_protocol       = "-1"
@@ -132,11 +108,6 @@ resource "aws_vpc_security_group_ingress_rule" "control_plane_egress_to_node_sec
   to_port                      = 443
   ip_protocol                  = "TCP"
 }
-
-#
-# Now follows several rules that are applied to the EKS cluster security group
-# to allow nodes to access control plane
-#
 
 resource "aws_vpc_security_group_ingress_rule" "cluster_control_plane_security_group_ingress" {
   description                  = "Allow pods to communicate with the cluster API Server"
@@ -165,9 +136,9 @@ resource "aws_vpc_security_group_egress_rule" "control_plane_egress_to_node_secu
   ip_protocol                  = "TCP"
 }
 
-# Launch Template defines how the autoscaling group will create worker nodes.
 resource "aws_launch_template" "node_launch_template" {
-  name = "NodeLaunchTemplate"
+  name = "NodeLaunchTemplate-${var.trainee_name}"
+
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
@@ -188,7 +159,7 @@ resource "aws_launch_template" "node_launch_template" {
   ]
 
   tags = {
-    "Name" = "NodeLaunchTemplate"
+    "Name" = "NodeLaunchTemplate-${var.trainee_name}"
   }
 
   image_id = data.aws_ssm_parameter.node_ami.value
@@ -201,41 +172,35 @@ resource "aws_launch_template" "node_launch_template" {
 
   tag_specifications {
     resource_type = "instance"
-
     tags = {
-      Name = "worker-node"
+      Name = "worker-node-${var.trainee_name}"
     }
   }
 
   user_data = base64encode(<<EOF
     #!/bin/bash
     set -o xtrace
-    /etc/eks/bootstrap.sh ${var.cluster_name}
+    /etc/eks/bootstrap.sh ${local.cluster_name}
     /opt/aws/bin/cfn-signal --exit-code $? \
-                --stack  ${var.cluster_name}-stack \
+                --stack  ${local.cluster_name}-stack \
                 --resource NodeGroup  \
-                --region us-east-1
+                --region ${var.aws_region}
     EOF
   )
 }
 
-
-# Wait for LT to settle, or CloudFormation may fail
 resource "time_sleep" "wait_30_seconds" {
   depends_on = [
     aws_launch_template.node_launch_template
   ]
-
   create_duration = "30s"
 }
 
-# Defer to CloudFormation here to create AutoScalingGroup
-# as the terraform ASG resource does not support UpdatePolicy
 resource "aws_cloudformation_stack" "autoscaling_group" {
   depends_on = [
     time_sleep.wait_30_seconds
   ]
-  name          = "eks-cluster-stack"
+  name          = "${local.cluster_name}-stack"
   template_body = <<EOF
 Description: "Node autoscaler"
 Resources:
@@ -251,7 +216,6 @@ Resources:
         LaunchTemplateId: "${aws_launch_template.node_launch_template.id}"
         Version: "${aws_launch_template.node_launch_template.latest_version}"
     UpdatePolicy:
-    # Ignore differences in group size properties caused by scheduled actions
       AutoScalingScheduledAction:
         IgnoreUnmodifiedGroupSizeProperties: true
       AutoScalingRollingUpdate:
@@ -262,5 +226,5 @@ Outputs:
   NodeAutoScalingGroup:
     Description: The autoscaling group
     Value: !Ref NodeGroup
-  EOF
+EOF
 }

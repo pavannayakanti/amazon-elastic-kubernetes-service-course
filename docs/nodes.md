@@ -3,7 +3,7 @@
 1.  Create a KUBECONFIG for `kubectl`
 
     ```bash
-    aws eks update-kubeconfig --region us-east-1 --name demo-eks
+    aws eks update-kubeconfig --region us-east-1 --name demo-eks-<trainee-name>
     ```
 
 1.  Join the worker nodes
@@ -65,5 +65,5 @@
 If you deployed the cluster into your own AWS account, you should delete resources when finished to avoid unwanted charges and also any risk of account compromise! This is *not* a security focused production grade deployment! Run the following:
 
 ```
-terraform destroy
+terraform destroy -var="trainee_name=<name>" -var="use_predefined_role=false"
 ```
